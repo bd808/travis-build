@@ -27,16 +27,18 @@ describe Travis::Build::Script::DirectoryCache::S3, :sexp do
   describe 'install' do
     before { cache.install }
 
+    # it { should include_sexp [:echo, 'Installing cache utilities'] }
+
     describe 'uses casher production in default mode' do
       it { should include_sexp [:export, ['CASHER_DIR', '$HOME/.casher'], echo: true] }
       it { should include_sexp [:mkdir, '$CASHER_DIR/bin', recursive: true] }
-      it { should include_sexp [:cmd,  'curl https://raw.githubusercontent.com/travis-ci/casher/production/bin/casher -L -o $CASHER_DIR/bin/casher -s --fail', retry: true] }
+      it { should include_sexp [:cmd,  'curl https://raw.githubusercontent.com/travis-ci/casher/production/bin/casher -L -o $CASHER_DIR/bin/casher -s --fail', retry: true, display: 'Installing caching utilities'] }
       it { should include_sexp [:cmd, '[ $? -ne 0 ] && echo \'Failed to fetch casher from GitHub, disabling cache.\' && echo > $CASHER_DIR/bin/casher'] }
     end
 
     describe 'uses casher master in edge mode' do
       let(:config) { { cache: { edge: true } } }
-      it { should include_sexp [:cmd, 'curl https://raw.githubusercontent.com/travis-ci/casher/master/bin/casher -L -o $CASHER_DIR/bin/casher -s --fail', retry: true] }
+      it { should include_sexp [:cmd, 'curl https://raw.githubusercontent.com/travis-ci/casher/master/bin/casher -L -o $CASHER_DIR/bin/casher -s --fail', retry: true, display: 'Installing caching utilities'] }
     end
   end
 
