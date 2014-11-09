@@ -101,6 +101,7 @@ module Travis
         end
 
         def configure
+          show_system_info
           fix_resolv_conf
           fix_etc_hosts
           run_addons(:before_checkout)
@@ -158,6 +159,13 @@ module Travis
           if data.hosts && data.hosts[:apt_cache]
             echo 'Setting up APT cache', ansi: :yellow
             raw %(echo 'Acquire::http { Proxy "#{data.hosts[:apt_cache]}"; };' | sudo tee /etc/apt/apt.conf.d/01proxy &> /dev/null)
+          end
+        end
+
+        def show_system_info
+          info_file = '/usr/local/system_info/system_info.log'
+          fold 'system_info' do
+            raw %(test -f #{info_file} && cat #{info_file} || true)
           end
         end
 
